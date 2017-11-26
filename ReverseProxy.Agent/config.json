@@ -1,0 +1,9 @@
+﻿{
+  "packetServerHost": "localhost",
+  "packetServerPort": "5000",
+
+  "securedServerHost": "target.int",
+  "securedServerPort": "443",
+
+  "logLevel": "Info"
+}

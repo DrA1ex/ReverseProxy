@@ -1,0 +1,9 @@
+﻿{
+  "packetServerPort": "5000",
+  "packetServerIpAddress": "0.0.0.0",
+
+  "externalServerPort": "8080",
+  "externalServerIpAddress": "0.0.0.0",
+
+  "logLevel": "Info"
+}
