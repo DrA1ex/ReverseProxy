@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <TargetFrameworks>netcoreapp2.0;net462</TargetFrameworks>
     <AssemblyName>ReverseProxy.RemoteServer</AssemblyName>
     <RootNamespace>ReverseProxy.RemoteServer</RootNamespace>
   </PropertyGroup>
