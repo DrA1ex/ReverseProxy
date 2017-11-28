@@ -33,7 +33,7 @@ namespace ReverseProxy.Network.Server
         {
             if(PacketReceiver != null)
             {
-                PacketReceiver.OnNewPacketReceived += PacketReceiverOnNewPacketReceived;
+                PacketReceiver.OnNewPacketReceived += OnNewPacket;
                 base.Start();
             }
             else
@@ -60,6 +60,8 @@ namespace ReverseProxy.Network.Server
                 LogUtils.LogDebugMessage("Added object #{0} into SessionMapping", clientId);
 
                 await session.Start(clientId, client);
+
+                LogUtils.LogDebugMessage("Connection with client ${0} is closed", clientId);
             }
             finally
             {
@@ -68,23 +70,31 @@ namespace ReverseProxy.Network.Server
             }
         }
 
-        private void PacketReceiverOnNewPacketReceived(object sender, Packet packet)
+        private void OnNewPacket(object sender, Packet packet)
         {
-            if(SessionMapping.TryGetValue(packet.Id, out var session))
+            if(SessionMapping.TryGetValue(packet.SessionId, out var session))
             {
-                session.QueuePacket(packet);
+                switch(packet.Type)
+                {
+                    case PacketType.Message:
+                        session.QueuePacket(packet);
+                        break;
+                    case PacketType.ConnectionClosed:
+                        session.Stop();
+                        break;
+                }
             }
             else
             {
                 // Received packet for already disconnected client
-                LogUtils.LogDebugMessage("Received message with undefined client Id: {0}", packet.Id);
+                LogUtils.LogDebugMessage("Received '{0}' packet with undefined client Id: {1}", packet.Type, packet.SessionId);
             }
         }
 
         public override void Stop()
         {
             base.Stop();
-            PacketReceiver.OnNewPacketReceived -= PacketReceiverOnNewPacketReceived;
+            PacketReceiver.OnNewPacketReceived -= OnNewPacket;
         }
     }
 }

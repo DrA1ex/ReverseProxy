@@ -1,4 +1,5 @@
 ﻿using System.Net.Sockets;
+using System.Threading.Tasks;
 using ReverseProxy.Common;
 using ReverseProxy.Common.Utils;
 using ReverseProxy.Network.Packets;
@@ -34,18 +35,45 @@ namespace ReverseProxy.Network.Client
 
         private async void OnNewPacket(object sender, Packet packet)
         {
-            SessionMapping.TryGetValue(packet.Id, out var session);
+            SessionMapping.TryGetValue(packet.SessionId, out var session);
 
-            if(session == null)
+            if(packet.Type == PacketType.Message)
             {
-                var client = new TcpClient();
-                await client.ConnectAsync(Host, Port);
+                if(session == null)
+                {
+                    try
+                    {
+                        session = await CreateSession(packet.SessionId);
+                    }
+                    catch(SocketException e)
+                    {
+                        LogUtils.LogErrorMessage("Unable to establish connection with target server: {0}", e);
+                        await PacketReceiver.SendPacket(new Packet
+                        {
+                            SessionId = packet.SessionId,
+                            Type = PacketType.ConnectionClosed
+                        });
+                        return;
+                    }
+                }
 
-                session = new PacketSession(PacketReceiver);
-                AcceptSession(session, packet.Id, client);
+                session.QueuePacket(packet);
             }
+            else if(packet.Type == PacketType.ConnectionClosed)
+            {
+                session?.Stop();
+            }
+        }
 
-            session.QueuePacket(packet);
+        private async Task<PacketSession> CreateSession(long sessionId)
+        {
+            var client = new TcpClient();
+            await client.ConnectAsync(Host, Port);
+
+            var session = new PacketSession(PacketReceiver);
+            AcceptSession(session, sessionId, client);
+
+            return session;
         }
 
         private async void AcceptSession(PacketSession session, long sessionId, TcpClient client)

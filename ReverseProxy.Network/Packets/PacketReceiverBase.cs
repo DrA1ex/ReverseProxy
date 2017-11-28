@@ -26,7 +26,7 @@ namespace ReverseProxy.Network.Packets
                 WriteQueue.QueueData(data);
             }
 
-            LogUtils.LogDebugMessage("Queue package Id: {0} Length: {1}", packet.Id, packet.Data.Length);
+            LogUtils.LogDebugMessage("Queue package Id: {0} of type {1} with data length: {2}", packet.SessionId, packet.Type, packet.Data?.Length ?? 0);
         }
 
         protected virtual Task StartWaitQueue(NetworkStream stream)
@@ -45,12 +45,12 @@ namespace ReverseProxy.Network.Packets
         {
             while(true)
             {
-                Packet message = null;
+                Packet packet = null;
 
                 try
                 {
                     var serializer = new BinarySerializer(BinarySerializationMethod.UnsafeSerialization);
-                    message = await serializer.Deserialize<Packet>(stream);
+                    packet = await serializer.Deserialize<Packet>(stream);
                 }
                 catch(IOException e) when(e.InnerException is SocketException)
                 {
@@ -61,10 +61,10 @@ namespace ReverseProxy.Network.Packets
                     LogUtils.LogException(e);
                 }
 
-                if(message != null)
+                if(packet != null)
                 {
-                    LogUtils.LogDebugMessage("Received packet Id: {0} Length: {1}", message.Id, message.Data.Length);
-                    OnNewPacket(message);
+                    LogUtils.LogDebugMessage("Received package Id: {0} of type {1} with data length: {2}", packet.SessionId, packet.Type, packet.Data?.Length ?? 0);
+                    OnNewPacket(packet);
                 }
                 else
                 {

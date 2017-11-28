@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net.Sockets;
+using System.Threading;
 using System.Threading.Tasks;
 using ReverseProxy.Common;
 using ReverseProxy.Common.Utils;
@@ -20,6 +21,7 @@ namespace ReverseProxy.Network.Sessions
         public bool Started { get; private set; }
 
         private SocketWriteQueue WritingQueue { get; } = new SocketWriteQueue();
+        private CancellationTokenSource CancellationSource { get; } = new CancellationTokenSource();
 
         public IPacketReceiver PacketReceiver { get; }
 
@@ -37,9 +39,29 @@ namespace ReverseProxy.Network.Sessions
                 using(client)
                 using(var stream = client.GetStream())
                 {
-                    await Task.WhenAll(
-                        ProcessIncomingData(sessionId, stream),
-                        WritingQueue.Start(stream));
+                    try
+                    {
+                        await Task.WhenAll(
+                            ProcessIncomingData(sessionId, stream),
+                            WritingQueue.Start(stream));
+
+                        if(!CancellationSource.IsCancellationRequested)
+                        {
+                            await PacketReceiver.SendPacket(new Packet
+                            {
+                                SessionId = sessionId,
+                                Type = PacketType.ConnectionClosed
+                            });
+                        }
+                    }
+                    catch(OperationCanceledException)
+                    {
+                        LogUtils.LogDebugMessage("Session {0} closed due to cancellation", sessionId);
+                    }
+                    catch(Exception e)
+                    {
+                        LogUtils.LogErrorMessage("Session {0} is closed due to error: {1}", sessionId, e);
+                    }
                 }
             }
             finally
@@ -55,27 +77,44 @@ namespace ReverseProxy.Network.Sessions
 
         private async Task ProcessIncomingData(long sessionId, NetworkStream stream)
         {
-            var buffer = new byte[DesiredReceiveBufferSize];
-
-            while(true)
+            try
             {
-                var read = await stream.ReadAsync(buffer, 0, buffer.Length);
+                var buffer = new byte[DesiredReceiveBufferSize];
 
-                if(read > 0)
+                while(true)
                 {
-                    LogUtils.LogDebugMessage("Read response data for session {0}. Length: {1}", sessionId, read);
+                    var read = await stream.ReadAsync(buffer, 0, buffer.Length, CancellationSource.Token);
 
-                    var message = new byte[read];
-                    Buffer.BlockCopy(buffer, 0, message, 0, read);
+                    if(read > 0)
+                    {
+                        LogUtils.LogDebugMessage("Read response data for session {0}. Length: {1}", sessionId, read);
 
-                    await PacketReceiver.SendPacket(new Packet(sessionId, message));
-                }
-                else
-                {
-                    WritingQueue.Stop();
-                    break; //disconnected
+                        var message = new byte[read];
+                        Buffer.BlockCopy(buffer, 0, message, 0, read);
+
+                        await PacketReceiver.SendPacket(new Packet
+                        {
+                            SessionId = sessionId,
+                            Type = PacketType.Message,
+                            Data = message
+                        });
+                    }
+                    else
+                    {
+                        break; //disconnected
+                    }
                 }
             }
+            finally
+            {
+                WritingQueue.Stop();
+            }
+        }
+
+        public void Stop()
+        {
+            CancellationSource.Cancel(true);
+            WritingQueue.Stop();
         }
     }
 }

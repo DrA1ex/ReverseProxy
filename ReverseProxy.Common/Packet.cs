@@ -1,24 +1,15 @@
-﻿using System;
-
-namespace ReverseProxy.Common
+﻿namespace ReverseProxy.Common
 {
-    [Serializable]
+    public enum PacketType : byte
+    {
+        Message,
+        ConnectionClosed
+    }
+
     public class Packet
     {
-        public Packet()
-        {
-        }
-
-        public Packet(long id, byte[] data)
-        {
-            Id = id;
-            Data = data;
-        }
-
-        public long Id { get; set; }
-
+        public long SessionId { get; set; }
+        public PacketType Type { get; set; }
         public byte[] Data { get; set; }
-
-        internal int MessageSize => sizeof(long) + sizeof(int) + Data.Length;
     }
 }
