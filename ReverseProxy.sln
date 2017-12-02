@@ -1,17 +1,19 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27004.2009
+VisualStudioVersion = 15.0.27004.2010
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReverseProxy.Agent", "ReverseProxy.Agent\ReverseProxy.Agent.csproj", "{771AC5F7-7D62-4F83-BC83-D5C4B48CBF7E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReverseProxy.Agent", "ReverseProxy.Agent\ReverseProxy.Agent.csproj", "{771AC5F7-7D62-4F83-BC83-D5C4B48CBF7E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReverseProxy.Common", "ReverseProxy.Common\ReverseProxy.Common.csproj", "{F64C35A0-5E29-487E-AD9A-539F8C9BBE90}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReverseProxy.Common", "ReverseProxy.Common\ReverseProxy.Common.csproj", "{F64C35A0-5E29-487E-AD9A-539F8C9BBE90}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReverseProxy.Network", "ReverseProxy.Network\ReverseProxy.Network.csproj", "{70A4BE68-70D0-4EA8-A09C-A6F1153317CB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReverseProxy.Network", "ReverseProxy.Network\ReverseProxy.Network.csproj", "{70A4BE68-70D0-4EA8-A09C-A6F1153317CB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReverseProxy.BinarySerialization", "ReverseProxy.BinarySerialization\ReverseProxy.BinarySerialization.csproj", "{310FE062-DBEC-4661-BDCD-79A0AEA9748A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReverseProxy.BinarySerialization", "ReverseProxy.BinarySerialization\ReverseProxy.BinarySerialization.csproj", "{310FE062-DBEC-4661-BDCD-79A0AEA9748A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReverseProxy.RemoteServer", "ReverseProxy.RemoteServer\ReverseProxy.RemoteServer.csproj", "{4806716D-BE55-439D-A9B3-EF3A2FDC493A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReverseProxy.Test", "ReverseProxy.Test\ReverseProxy.Test.csproj", "{D3C1145C-1F38-4FB3-A4E9-5D35D64CC700}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{4806716D-BE55-439D-A9B3-EF3A2FDC493A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4806716D-BE55-439D-A9B3-EF3A2FDC493A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4806716D-BE55-439D-A9B3-EF3A2FDC493A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D3C1145C-1F38-4FB3-A4E9-5D35D64CC700}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D3C1145C-1F38-4FB3-A4E9-5D35D64CC700}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D3C1145C-1F38-4FB3-A4E9-5D35D64CC700}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D3C1145C-1F38-4FB3-A4E9-5D35D64CC700}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
