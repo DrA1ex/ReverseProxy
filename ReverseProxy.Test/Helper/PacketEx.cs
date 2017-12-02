@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using ReverseProxy.Common;
+using ReverseProxy.Common.Model;
 
 namespace ReverseProxy.Test.Helper
 {

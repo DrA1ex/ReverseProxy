@@ -32,7 +32,7 @@ namespace ReverseProxy.Network.Client
                 await Bind(client);
             }
 
-            LogUtils.LogErrorMessage("Lost connection with Packet Server");
+            Logger.Error("Lost connection with Packet Server");
 
             if(Reconnect)
             {
@@ -46,7 +46,7 @@ namespace ReverseProxy.Network.Client
 
             while(true)
             {
-                LogUtils.LogInfoMessage("Connecting to server...");
+                Logger.Info("Connecting to server...");
 
                 try
                 {
@@ -55,8 +55,8 @@ namespace ReverseProxy.Network.Client
                 }
                 catch(Exception e)
                 {
-                    LogUtils.LogErrorMessage("Failed to connect: {0}:", e.Message);
-                    LogUtils.LogInfoMessage("Queue next connection try after {0}", timeout.ToDurationString(30));
+                    Logger.Error("Failed to connect: {0}:", e.Message);
+                    Logger.Info("Queue next connection try after {0}", timeout.ToDurationString(30));
                 }
 
                 await Task.Delay(timeout);

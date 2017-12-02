@@ -3,8 +3,8 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
-using ReverseProxy.Common;
-using ReverseProxy.Common.Utils;
+using NLog;
+using ReverseProxy.Common.Model;
 using ReverseProxy.Network.Packets;
 using ReverseProxy.Network.Server.Base;
 using ReverseProxy.Network.Sessions;
@@ -20,6 +20,8 @@ namespace ReverseProxy.Network.Server
             : base(address, port)
         {
         }
+
+        protected Logger Logger { get; } = LogManager.GetCurrentClassLogger();
 
         public IPacketReceiver PacketReceiver { get; set; }
         private SessionMapping SessionMapping { get; } = new SessionMapping();
@@ -50,23 +52,23 @@ namespace ReverseProxy.Network.Server
 
         private async void AcceptSession(long clientId, TcpClient client)
         {
-            LogUtils.LogDebugMessage("New client connected #{0} {1}", clientId, client.Client.RemoteEndPoint);
+            Logger.Debug("New client connected #{0} {1}", clientId, client.Client.RemoteEndPoint);
 
             var session = new PacketSession(PacketReceiver);
 
             try
             {
                 SessionMapping.TryAdd(clientId, session);
-                LogUtils.LogDebugMessage("Added object #{0} into SessionMapping", clientId);
+                Logger.Trace("Added object #{0} into SessionMapping", clientId);
 
                 await session.Start(clientId, client);
 
-                LogUtils.LogDebugMessage("Connection with client ${0} is closed", clientId);
+                Logger.Debug("Connection with client ${0} is closed", clientId);
             }
             finally
             {
                 SessionMapping.TryRemove(clientId, out var _);
-                LogUtils.LogDebugMessage("Removed object #{0} from SessionMapping", clientId);
+                Logger.Trace("Removed object #{0} from SessionMapping", clientId);
             }
         }
 
@@ -87,7 +89,7 @@ namespace ReverseProxy.Network.Server
             else
             {
                 // Received packet for already disconnected client
-                LogUtils.LogDebugMessage("Received '{0}' packet with undefined client Id: {1}", packet.Type, packet.SessionId);
+                Logger.Debug("Received '{0}' packet with undefined client Id: {1}", packet.Type, packet.SessionId);
             }
         }
 

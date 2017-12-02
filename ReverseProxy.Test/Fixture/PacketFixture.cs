@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using ReverseProxy.Common;
+using ReverseProxy.Common.Model;
 using ReverseProxy.Test.Utils;
 
 namespace ReverseProxy.Test.Fixture

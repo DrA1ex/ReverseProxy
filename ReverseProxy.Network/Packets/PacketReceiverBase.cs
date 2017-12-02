@@ -2,15 +2,17 @@
 using System.IO;
 using System.Net.Sockets;
 using System.Threading.Tasks;
+using NLog;
 using ReverseProxy.BinarySerialization;
-using ReverseProxy.Common;
-using ReverseProxy.Common.Utils;
+using ReverseProxy.Common.Model;
 using ReverseProxy.Network.Misc;
 
 namespace ReverseProxy.Network.Packets
 {
     public abstract class PacketReceiverBase : IPacketReceiver
     {
+        protected Logger Logger { get; } = LogManager.GetCurrentClassLogger();
+
         private SocketWriteQueue WriteQueue { get; } = new SocketWriteQueue();
 
         public virtual async Task SendPacket(Packet packet)
@@ -26,15 +28,15 @@ namespace ReverseProxy.Network.Packets
                 WriteQueue.QueueData(data);
             }
 
-            LogUtils.LogDebugMessage("Queue package Id: {0} of type {1} with data length: {2}", packet.SessionId, packet.Type, packet.Data?.Length ?? 0);
+            Logger.Debug("Queue package Id: {0} of type {1} with data length: {2}", packet.SessionId, packet.Type, packet.Data?.Length ?? 0);
         }
+
+        public event EventHandler<Packet> OnNewPacketReceived;
 
         protected virtual Task StartWaitQueue(NetworkStream stream)
         {
             return WriteQueue.Start(stream);
         }
-
-        public event EventHandler<Packet> OnNewPacketReceived;
 
         protected virtual void OnNewPacket(Packet packet)
         {
@@ -58,17 +60,17 @@ namespace ReverseProxy.Network.Packets
                 }
                 catch(Exception e)
                 {
-                    LogUtils.LogException(e);
+                    Logger.Error(e);
                 }
 
                 if(packet != null)
                 {
-                    LogUtils.LogDebugMessage("Received package Id: {0} of type {1} with data length: {2}", packet.SessionId, packet.Type, packet.Data?.Length ?? 0);
+                    Logger.Debug("Received package Id: {0} of type {1} with data length: {2}", packet.SessionId, packet.Type, packet.Data?.Length ?? 0);
                     OnNewPacket(packet);
                 }
                 else
                 {
-                    LogUtils.LogErrorMessage("Packet receiver lost connection");
+                    Logger.Debug("Packet receiver lost connection");
                     WriteQueue.Stop();
                     break; //disconnected or network error
                 }
@@ -80,7 +82,7 @@ namespace ReverseProxy.Network.Packets
             using(client)
             using(var stream = client.GetStream())
             {
-                LogUtils.LogInfoMessage("New packet connection: {0}", client.Client.RemoteEndPoint);
+                Logger.Info("New packet connection: {0}", client.Client.RemoteEndPoint);
 
                 await Task.WhenAll(
                     StartWaitQueue(stream),

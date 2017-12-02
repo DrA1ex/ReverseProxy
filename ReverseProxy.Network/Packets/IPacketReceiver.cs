@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
-using ReverseProxy.Common;
+using ReverseProxy.Common.Model;
 
 namespace ReverseProxy.Network.Packets
 {

@@ -2,8 +2,8 @@
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
-using ReverseProxy.Common;
-using ReverseProxy.Common.Utils;
+using NLog;
+using ReverseProxy.Common.Model;
 using ReverseProxy.Network.Misc;
 using ReverseProxy.Network.Packets;
 
@@ -17,6 +17,8 @@ namespace ReverseProxy.Network.Sessions
         {
             PacketReceiver = packetReceiver;
         }
+
+        protected Logger Logger { get; } = LogManager.GetCurrentClassLogger();
 
         public bool Started { get; private set; }
 
@@ -41,6 +43,8 @@ namespace ReverseProxy.Network.Sessions
                 {
                     try
                     {
+                        Logger.Trace("Packet session started");
+
                         await Task.WhenAll(
                             ProcessIncomingData(sessionId, stream),
                             WritingQueue.Start(stream));
@@ -56,17 +60,19 @@ namespace ReverseProxy.Network.Sessions
                     }
                     catch(OperationCanceledException)
                     {
-                        LogUtils.LogDebugMessage("Session {0} closed due to cancellation", sessionId);
+                        Logger.Debug("Session {0} closed due to cancellation", sessionId);
                     }
                     catch(Exception e)
                     {
-                        LogUtils.LogErrorMessage("Session {0} is closed due to error: {1}", sessionId, e);
+                        Logger.Debug("Session {0} is closed due to error: {1}", sessionId, e);
                     }
                 }
             }
             finally
             {
                 Started = false;
+
+                Logger.Trace("Packet session stoped");
             }
         }
 
@@ -77,17 +83,18 @@ namespace ReverseProxy.Network.Sessions
 
         private async Task ProcessIncomingData(long sessionId, NetworkStream stream)
         {
+            Logger.Trace("Session incoming data processing started");
+
             try
             {
                 var buffer = new byte[DesiredReceiveBufferSize];
-
                 while(true)
                 {
                     var read = await stream.ReadAsync(buffer, 0, buffer.Length, CancellationSource.Token);
 
                     if(read > 0)
                     {
-                        LogUtils.LogDebugMessage("Read response data for session {0}. Length: {1}", sessionId, read);
+                        Logger.Debug("Read response data for session {0}. Length: {1}", sessionId, read);
 
                         var message = new byte[read];
                         Buffer.BlockCopy(buffer, 0, message, 0, read);
@@ -108,6 +115,7 @@ namespace ReverseProxy.Network.Sessions
             finally
             {
                 WritingQueue.Stop();
+                Logger.Trace("Session incoming data processing stoped");
             }
         }
 

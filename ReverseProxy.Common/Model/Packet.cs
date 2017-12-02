@@ -1,4 +1,4 @@
-﻿namespace ReverseProxy.Common
+﻿namespace ReverseProxy.Common.Model
 {
     public enum PacketType : byte
     {

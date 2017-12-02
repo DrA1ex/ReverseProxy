@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ReverseProxy.BinarySerialization;
 using ReverseProxy.Common;
+using ReverseProxy.Common.Model;
 using ReverseProxy.Network.Server;
 using ReverseProxy.Test.Fixture;
 using ReverseProxy.Test.Helper;

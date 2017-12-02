@@ -5,7 +5,7 @@ namespace ReverseProxy.BinarySerialization.Utils
 {
     internal static class TraceUtils
     {
-        [Conditional("TRACE")]
+        [Conditional("SERIALIZATION_TRACE")]
         internal static void WriteLineFormatted(string format, params object[] args)
         {
             Debug.Assert(format != null);

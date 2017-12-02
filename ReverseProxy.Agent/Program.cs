@@ -1,7 +1,6 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Threading;
-using ReverseProxy.Common;
+using NLog;
 using ReverseProxy.Common.Utils;
 using ReverseProxy.Network.Client;
 
@@ -9,6 +8,8 @@ namespace ReverseProxy.Agent
 {
     internal class Program
     {
+        private static Logger Logger { get; } = LogManager.GetCurrentClassLogger();
+
         private static int PacketServerPort { get; set; }
         private static string PacketServerHost { get; set; }
 
@@ -23,7 +24,7 @@ namespace ReverseProxy.Agent
             }
             catch(Exception e)
             {
-                LogUtils.LogErrorMessage("Parameters loading failed: {0}", e);
+                Logger.Error(e, "Parameters loading failed");
                 return;
             }
 
@@ -31,8 +32,8 @@ namespace ReverseProxy.Agent
 
             try
             {
-                LogUtils.LogInfoMessage($"Starting proxy agent for {SecuredServerHost}:{SecuredServerPort}");
-                LogUtils.LogInfoMessage($"Connecting to packet server {PacketServerHost}:{PacketServerPort}");
+                Logger.Info($"Starting proxy agent for {SecuredServerHost}:{SecuredServerPort}");
+                Logger.Info($"Connecting to packet server {PacketServerHost}:{PacketServerPort}");
 
                 // ReSharper disable once UnusedVariable
                 var proxyClient = new ProxyClient(SecuredServerHost, SecuredServerPort)
@@ -44,8 +45,7 @@ namespace ReverseProxy.Agent
             }
             catch(Exception e)
             {
-                LogUtils.LogErrorMessage("Unable to connect to Packet server: {0}", e);
-                Trace.WriteLine("Unable to connect to Packet server: {0}");
+                Logger.Fatal(e);
             }
         }
 
@@ -56,11 +56,6 @@ namespace ReverseProxy.Agent
 
             SecuredServerHost = ConfigUtils.GetString("securedServerHost");
             SecuredServerPort = ConfigUtils.GetInt("securedServerPort");
-
-            var logLevel = ConfigUtils.TryGetString("logLevel");
-            Enum.TryParse(logLevel, true, out LogLevel level);
-
-            LogUtils.Level = level;
         }
     }
 }

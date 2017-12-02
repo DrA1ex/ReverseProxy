@@ -3,12 +3,15 @@ using System.Collections.Concurrent;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
+using NLog;
 using ReverseProxy.Common.Utils;
 
 namespace ReverseProxy.Network.Misc
 {
     public class SocketWriteQueue
     {
+        protected Logger Logger { get; } = LogManager.GetCurrentClassLogger();
+
         private ManualResetEvent DataAvailableEvent { get; } = new ManualResetEvent(false);
         private ManualResetEvent StopEvent { get; } = new ManualResetEvent(false);
 
@@ -25,6 +28,7 @@ namespace ReverseProxy.Network.Misc
 
             try
             {
+                Logger.Trace("Queue  is started");
                 Started = true;
                 await ProcessQueue(stream);
             }
@@ -46,6 +50,8 @@ namespace ReverseProxy.Network.Misc
                 throw new InvalidOperationException("Unable to queue element: Queue processing is not running");
             }
 
+            Logger.Trace("Queue new element {0}", data.GetHashCode());
+
             DataQueue.Enqueue(data);
             DataAvailableEvent.Set();
         }
@@ -61,20 +67,23 @@ namespace ReverseProxy.Network.Misc
                     byte[] data;
                     while(!DataQueue.TryDequeue(out data))
                     {
+                        Logger.Trace("Unable to deque element from Queue due to concurrency access");
                     }
 
                     if(DataQueue.IsEmpty)
                     {
+                        Logger.Trace("Writing queue is empty. Wait for new element...");
                         DataAvailableEvent.Reset();
                     }
 
                     try
                     {
+                        Logger.Trace("Write queue element {0}", data.GetHashCode());
                         await stream.WriteAsync(data, 0, data.Length);
                     }
                     catch(Exception e)
                     {
-                        LogUtils.LogDebugMessage("Unable to send data: {0}", e);
+                        Logger.Debug(e, "Unable to send data");
                         QueueData(data);
 
                         break;
@@ -82,6 +91,7 @@ namespace ReverseProxy.Network.Misc
                 }
                 else
                 {
+                    Logger.Trace("Queue  is stopped");
                     StopEvent.Reset();
                     break;
                 }

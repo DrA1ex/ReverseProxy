@@ -1,7 +1,7 @@
 ﻿using System.Net.Sockets;
 using System.Threading.Tasks;
-using ReverseProxy.Common;
-using ReverseProxy.Common.Utils;
+using NLog;
+using ReverseProxy.Common.Model;
 using ReverseProxy.Network.Packets;
 using ReverseProxy.Network.Sessions;
 using SessionMapping = System.Collections.Concurrent.ConcurrentDictionary<long, ReverseProxy.Network.Sessions.PacketSession>;
@@ -17,6 +17,8 @@ namespace ReverseProxy.Network.Client
             Host = host;
             Port = port;
         }
+
+        protected Logger Logger { get; } = LogManager.GetCurrentClassLogger();
 
         private SessionMapping SessionMapping { get; } = new SessionMapping();
 
@@ -47,7 +49,7 @@ namespace ReverseProxy.Network.Client
                     }
                     catch(SocketException e)
                     {
-                        LogUtils.LogErrorMessage("Unable to establish connection with target server: {0}", e);
+                        Logger.Error("Unable to establish connection with target server: {0}", e);
                         await PacketReceiver.SendPacket(new Packet
                         {
                             SessionId = packet.SessionId,
@@ -78,19 +80,19 @@ namespace ReverseProxy.Network.Client
 
         private async void AcceptSession(PacketSession session, long sessionId, TcpClient client)
         {
-            LogUtils.LogDebugMessage("New client connected #{0} {1}", sessionId, client.Client.RemoteEndPoint);
+            Logger.Debug("New client connected #{0} {1}", sessionId, client.Client.RemoteEndPoint);
 
             try
             {
                 SessionMapping.TryAdd(sessionId, session);
-                LogUtils.LogDebugMessage("Added object #{0} into SessionMapping", sessionId);
+                Logger.Debug("Added object #{0} into SessionMapping", sessionId);
 
                 await session.Start(sessionId, client);
             }
             finally
             {
                 SessionMapping.TryRemove(sessionId, out var _);
-                LogUtils.LogDebugMessage("Removed object #{0} from SessionMapping", sessionId);
+                Logger.Debug("Removed object #{0} from SessionMapping", sessionId);
             }
         }
     }
