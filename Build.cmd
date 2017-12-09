@@ -1,4 +1,4 @@
-dotnet clean
+dotnet clean -f net462 -r win10-x64
 dotnet restore
 dotnet publish -c Release -f net462 -r win10-x64
 
