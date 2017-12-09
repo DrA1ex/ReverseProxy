@@ -13,7 +13,7 @@ namespace ReverseProxy.Network.Packets
     {
         protected Logger Logger { get; } = LogManager.GetCurrentClassLogger();
 
-        private SocketWriteQueue WriteQueue { get; } = new SocketWriteQueue();
+        private StreamWriteQueue WriteQueue { get; } = new StreamWriteQueue();
 
         public virtual async Task SendPacket(Packet packet)
         {
@@ -33,7 +33,7 @@ namespace ReverseProxy.Network.Packets
 
         public event EventHandler<Packet> OnNewPacketReceived;
 
-        protected virtual Task StartWaitQueue(NetworkStream stream)
+        protected virtual Task StartWaitQueue(Stream stream)
         {
             return WriteQueue.Start(stream);
         }
@@ -43,7 +43,7 @@ namespace ReverseProxy.Network.Packets
             OnNewPacketReceived?.Invoke(this, packet);
         }
 
-        protected virtual async Task ProcessIncomingPackages(NetworkStream stream)
+        protected virtual async Task ProcessIncomingPackages(Stream stream)
         {
             while(true)
             {

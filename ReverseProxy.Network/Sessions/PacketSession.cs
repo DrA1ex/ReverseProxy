@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
@@ -22,7 +23,7 @@ namespace ReverseProxy.Network.Sessions
 
         public bool Started { get; private set; }
 
-        private SocketWriteQueue WritingQueue { get; } = new SocketWriteQueue();
+        private StreamWriteQueue WritingQueue { get; } = new StreamWriteQueue();
         private CancellationTokenSource CancellationSource { get; } = new CancellationTokenSource();
 
         public IPacketReceiver PacketReceiver { get; }
@@ -81,7 +82,7 @@ namespace ReverseProxy.Network.Sessions
             WritingQueue.QueueData(packet.Data);
         }
 
-        private async Task ProcessIncomingData(long sessionId, NetworkStream stream)
+        private async Task ProcessIncomingData(long sessionId, Stream stream)
         {
             Logger.Trace("Session incoming data processing started");
 

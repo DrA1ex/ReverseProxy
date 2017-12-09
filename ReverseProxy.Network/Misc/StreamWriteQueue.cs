@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Net.Sockets;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using NLog;
@@ -8,7 +8,7 @@ using ReverseProxy.Common.Utils;
 
 namespace ReverseProxy.Network.Misc
 {
-    public class SocketWriteQueue
+    public class StreamWriteQueue
     {
         protected Logger Logger { get; } = LogManager.GetCurrentClassLogger();
 
@@ -19,7 +19,7 @@ namespace ReverseProxy.Network.Misc
 
         public bool Started { get; private set; }
 
-        public async Task Start(NetworkStream stream)
+        public async Task Start(Stream stream)
         {
             if(Started)
             {
@@ -56,7 +56,7 @@ namespace ReverseProxy.Network.Misc
             DataAvailableEvent.Set();
         }
 
-        private async Task ProcessQueue(NetworkStream stream)
+        private async Task ProcessQueue(Stream stream)
         {
             while(true)
             {
