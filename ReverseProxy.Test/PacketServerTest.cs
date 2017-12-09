@@ -1,11 +1,9 @@
 using System;
-using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ReverseProxy.BinarySerialization;
-using ReverseProxy.Common;
 using ReverseProxy.Common.Model;
 using ReverseProxy.Network.Server;
 using ReverseProxy.Test.Fixture;
@@ -163,15 +161,11 @@ namespace ReverseProxy.Test
                     foreach(var packet in serverSequence)
                     {
                         var task = packetServer.SendPacket(packet);
-                        serverTask = serverTask?.ContinueWith(t =>
-                        {
-                            Trace.WriteLine("SendPacket task finished");
-                            return task;
-                        }).Unwrap() ?? task;
+                        serverTask = serverTask?.ContinueWith(t => task).Unwrap() ?? task;
                     }
 
                     var clientSequence = PacketFixture.GetPacketSequence(PacketSequenceLength);
-                    Task clientTask = Task.CompletedTask;
+                    var clientTask = Task.CompletedTask;
                     foreach(var packet in clientSequence)
                     {
                         // ReSharper disable once AccessToDisposedClosure
