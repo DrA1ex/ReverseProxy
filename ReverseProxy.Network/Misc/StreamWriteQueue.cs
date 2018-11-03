@@ -65,7 +65,7 @@ namespace ReverseProxy.Network.Misc
                 if(!StopEvent.WaitOne(0))
                 {
                     byte[] data;
-                    while(!DataQueue.TryDequeue(out data))
+                    if(!DataQueue.TryDequeue(out data))
                     {
                         Logger.Trace("Unable to deque element from Queue due to concurrency access");
                     }

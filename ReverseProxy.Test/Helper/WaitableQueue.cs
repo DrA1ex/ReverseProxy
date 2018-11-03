@@ -28,8 +28,9 @@ namespace ReverseProxy.Test.Helper
             }
 
             T value;
-            while(!Queue.TryDequeue(out value))
+            if(!Queue.TryDequeue(out value))
             {
+                return await Dequeue(timeout);
             }
 
             if(Queue.IsEmpty)
