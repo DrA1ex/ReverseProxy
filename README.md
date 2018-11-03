@@ -21,3 +21,21 @@ Proxy consisnt of 2 components:
 ## Requirements
 - .NET 4.6.2 for Windows
 - .NET Core 2.0 for Linux, Mac and Windows
+
+## Building
+You can use Build.cmd or use dotnet toolkit:
+For Windows:
+
+```dotnet publish -c Release -f net462 -r win10-x64```
+
+For Mac:
+
+```dotnet publish -c Release -r osx-x64```
+
+For Linux:
+
+```dotnet publish -c Release -r linux-x64```
+
+For all platforms:
+
+```dotnet publish -c Release -f netcoreapp2.0```
