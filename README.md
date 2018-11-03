@@ -17,3 +17,7 @@ Proxy consisnt of 2 components:
 ## Connection diagram
 
 ![Pic. 1](https://user-images.githubusercontent.com/1194059/47950632-9395c080-df76-11e8-8aaa-eb9997315ba2.png)
+
+## Requirements
+- .NET 4.6.2 for Windows
+- .NET Core 2.0 for Linux, Mac and Windows
