@@ -1,18 +1,16 @@
 # Reverse Proxy
 
-This is a simple Reverse Proxy implementation.
-It allows you to access remote server in DMZ-Network without external IP/Internet access.
-Reverse proxy support any TCP protocol such as SSL/TLS
+This is a simple implementation of a reverse proxy that allows you to access a remote server in a DMZ network without external IP or internet access. The reverse proxy supports any TCP protocol, including SSL/TLS.
 
-Proxy consisnt of 2 components: 
-- **Remote Server** that listen to incoming connections from external network and proxying traffic through to **Agent** (a secure server)
-- **Agent** that connects to external **Remote Server** and proxying incoming/outcoming traffic to/from a secure server
+The proxy consists of two components:
+- **Remote Server**: Listens to incoming connections from the external network and proxies traffic to the **Agent** (a secure server).
+- **Agent**: Connects to the external **Remote Server** and proxies incoming/outgoing traffic to/from a secure server.
 
-## How it works
-- **Agent** is proxying all traffic to a secure server without any access from extenral network
-- **Agent** connects to **Remote Server**, placed in external network and it's proxying all incoming packets, so secure server may not has external IP at all or Firewall may block all incoming connections from WEB.
-- **Remote server** listen to incoming connections. For external clients **Remote server** acting just like a target server (e.g. some database or file server)
-- **Remote server** interacts with **Agent** with special packets which represents tarffic between external client and internal server
+## How it Works
+- The **Agent** proxies all traffic to a secure server without any access from the external network.
+- The **Agent** connects to the **Remote Server**, which is placed in the external network, and proxies all incoming packets. Therefore, the secure server may not have an external IP at all, or the firewall may block all incoming connections from the web.
+- The **Remote Server** listens to incoming connections and acts as a target server for external clients (e.g., a database or file server).
+- The **Remote Server** interacts with the **Agent** using special packets that represent traffic between the external client and internal server.
 
 ## Connection diagram
 
